@@ -27,7 +27,7 @@ def _is_github_url(s: str) -> bool:
 def _clone(url: str, dest: Path) -> Path:
     """Clone a GitHub URL into dest. Returns the clone path."""
     # Normalize: ensure .git suffix is stripped from dest dir name
-    cmd = ["git", "clone", "--depth", "1", url, str(dest)]
+    cmd = ["git", "clone", url, str(dest)]
     try:
         subprocess.run(cmd, check=True, capture_output=True, text=True)
     except FileNotFoundError:
