@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+
+# Tool output (don't commit generated reports)
+ARCHITECTURE.md
+EXECUTIVE_SUMMARY.md
+FIRST_15_MINUTES.md
+
+# OS
+.DS_Store

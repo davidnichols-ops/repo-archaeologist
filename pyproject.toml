@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "repo-archaeologist"
+version = "0.1.0"
+description = "Point it at an abandoned repo. Get an opinionated architecture, risk, and onboarding briefing in seconds."
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "David Nichols" }]
+requires-python = ">=3.9"
+keywords = ["architecture", "onboarding", "static-analysis", "developer-tools", "code-review"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Software Development :: Documentation",
+    "Topic :: Software Development :: Pre-processors",
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=7", "build>=1"]
+
+[project.scripts]
+repo-archaeologist = "repo_archaeologist.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["repo_archaeologist*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
