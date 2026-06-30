@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import List, Optional
 
 from repo_archaeologist import __version__
-from repo_archaeologist.analyzer import AnalysisResult, analyze
+from repo_archaeologist.analyzer import AnalysisOptions, AnalysisResult, analyze
 
 GITHUB_URL_RE = re.compile(
     r"^(?:https?://)?(?:www\.)?github\.com/[\w.-]+/[\w.-]+?(?:\.git)?(?:/|$)",
@@ -108,6 +108,18 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Where to write reports. Defaults to the target directory (or cwd for remote URLs).",
     )
+    analyze_p.add_argument(
+        "--no-dead-code",
+        action="store_true",
+        default=False,
+        help="Skip dead code estimation (no Dead Code Estimate section in ARCHITECTURE.md).",
+    )
+    analyze_p.add_argument(
+        "--no-security",
+        action="store_true",
+        default=False,
+        help="Skip the security scan (no SECURITY.md report).",
+    )
 
     return parser
 
@@ -128,7 +140,11 @@ def main(argv: Optional[List[str]] = None) -> int:
             out_dir = target
 
         try:
-            result = analyze(target, out_dir=out_dir)
+            options = AnalysisOptions(
+                dead_code=not args.no_dead_code,
+                security=not args.no_security,
+            )
+            result = analyze(target, out_dir=out_dir, options=options)
             result.cloned = cloned
             _print_summary(result, out_dir)
         finally:

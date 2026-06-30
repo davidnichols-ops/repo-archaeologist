@@ -2,10 +2,11 @@
 
 > Point it at an abandoned repo. Get an opinionated briefing in seconds.
 
-Developers inherit abandoned GitHub repositories all the time. Nobody knows what works, what's broken, where the dependencies are risky, or what the architecture even is. `repo-archaeologist` reads the repo for you and writes three markdown files you can actually skim:
+Developers inherit abandoned GitHub repositories all the time. Nobody knows what works, what's broken, where the dependencies are risky, or what the architecture even is. `repo-archaeologist` reads the repo for you and writes four markdown files you can actually skim:
 
 - **`EXECUTIVE_SUMMARY.md`** — a 60-second briefing: time-to-understand, risk level, likely purpose, first file to read, most important dependency, suggested first contribution.
-- **`ARCHITECTURE.md`** — tech stack, entry points, dependency table, top-level file tree, module breakdown.
+- **`ARCHITECTURE.md`** — tech stack, entry points, dependency table, top-level file tree, module breakdown, a Mermaid dependency diagram, and a dead code estimate.
+- **`SECURITY.md`** — a best-effort static security scan: likely secrets, deprecated packages, and dangerous calls, grouped by severity.
 - **`FIRST_15_MINUTES.md`** — the killer feature for juniors: "read these files", "ignore these", "run this".
 
 No website. No signup. No dashboard. No API key.
@@ -57,6 +58,19 @@ repo-archaeologist analyze . --out-dir ./reports
 
 Reports are written to the target directory by default (or `--out-dir`).
 
+Skip optional scans (they run by default):
+
+```bash
+repo-archaeologist analyze . --no-security        # skip SECURITY.md
+repo-archaeologist analyze . --no-dead-code       # skip dead code estimate
+```
+
+## Features
+
+- **Dead code estimation** — detects Python modules and JS files that are never imported or required by any other source file. Findings are surfaced in the *Dead Code Estimate* section of `ARCHITECTURE.md`. Entry points and test files are excluded to reduce false positives.
+- **Security scan** — a static, offline scan for likely secrets (AWS keys, GitHub tokens, Slack tokens, Google API keys, JWTs, private key blocks, high-entropy strings assigned to secret-looking names), deprecated/abandoned packages (from `requirements.txt`, `pyproject.toml`, `package.json`), and dangerous calls (`eval`, `exec`, `os.system`, `subprocess` with `shell=True`, `pickle.load`, `mktemp`, JS `new Function`, `child_process` with `shell: true`). Findings are written to `SECURITY.md` grouped by severity (CRITICAL / HIGH / MEDIUM / LOW / INFO).
+- **Mermaid architecture diagrams** — `ARCHITECTURE.md` includes a best-effort `mermaid` graph of local module dependencies derived from static imports. External dependencies are collapsed into a single node to keep the diagram readable.
+
 ## What it detects (v1)
 
 - Languages and LOC distribution
@@ -73,10 +87,7 @@ A working heuristic version is more useful than a broken AI version. v1 is deter
 
 ## Roadmap
 
-- [ ] Dead code estimation (unreferenced module detection)
-- [ ] Security scan (secrets, deprecated packages, dangerous calls)
 - [ ] Optional LLM enrichment (OpenAI / Anthropic) for narrative prose
-- [ ] Mermaid architecture diagrams
 - [ ] GitHub Action: auto-comment on PRs with architecture/risk diff
 - [ ] VS Code extension: right-click folder → "Explain Repository"
 

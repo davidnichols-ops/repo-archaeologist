@@ -188,8 +188,12 @@ def render(facts: Facts) -> str:
     lines.append(f"- Lockfile: {'yes' if s.has_lockfile else 'no'}\n")
 
     lines.append("## Read next\n")
-    lines.append("- `ARCHITECTURE.md` — full tech stack, dependency table, module breakdown.")
-    lines.append("- `FIRST_15_MINUTES.md` — exactly which files to read, which to ignore, and what to run.\n")
+    lines.append("- `ARCHITECTURE.md` — full tech stack, dependency table, module breakdown, dependency diagram, dead code estimate.")
+    lines.append("- `FIRST_15_MINUTES.md` — exactly which files to read, which to ignore, and what to run.")
+    if facts.security is not None and facts.security.count:
+        lines.append(f"- `SECURITY.md` — security scan with {facts.security.count} finding(s) ({facts.security.critical_count} critical, {facts.security.high_count} high).\n")
+    else:
+        lines.append("- `SECURITY.md` — security scan (secrets, deprecated packages, dangerous calls).\n")
 
     return "\n".join(lines)
 

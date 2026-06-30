@@ -26,12 +26,12 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 # ---------- Self-analysis ----------
 
 
-def test_self_analysis_writes_three_reports(tmp_path):
+def test_self_analysis_writes_four_reports(tmp_path):
     out_dir = tmp_path / "reports"
     result = analyze(REPO_ROOT, out_dir=out_dir)
 
     names = {p.name for p in result.reports}
-    assert names == {"ARCHITECTURE.md", "EXECUTIVE_SUMMARY.md", "FIRST_15_MINUTES.md"}
+    assert names == {"ARCHITECTURE.md", "EXECUTIVE_SUMMARY.md", "FIRST_15_MINUTES.md", "SECURITY.md"}
 
 
 def test_self_analysis_executive_summary_has_sections(tmp_path):
@@ -146,7 +146,7 @@ def test_empty_dir_does_not_crash(tmp_path):
     empty = tmp_path / "empty"
     empty.mkdir()
     result = analyze(empty, out_dir=tmp_path / "out")
-    assert len(result.reports) == 3
+    assert len(result.reports) == 4
     text = (tmp_path / "out" / "EXECUTIVE_SUMMARY.md").read_text(encoding="utf-8")
     assert "Executive Summary" in text
 

@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import List
 
+from repo_archaeologist.collectors.imports import mermaid
 from repo_archaeologist.facts import Facts
 
 
@@ -88,6 +89,38 @@ def render(facts: Facts) -> str:
         parts.append("")
     else:
         parts.append("_No source modules grouped by directory._\n")
+
+    # Mermaid dependency diagram (best-effort)
+    parts.append("## Dependency Diagram\n")
+    if facts.imports and facts.imports.has_graph:
+        parts.append("_Best-effort module dependency graph from static imports. Local modules only; external dependencies are collapsed._\n")
+        parts.append("```mermaid")
+        parts.append(mermaid(facts.imports))
+        parts.append("```\n")
+    else:
+        parts.append("_No local import graph could be built (too few modules or no imports detected)._\n")
+
+    # Dead code estimation
+    parts.append("## Dead Code Estimate\n")
+    if facts.dead_code is not None:
+        dc = facts.dead_code
+        if dc.modules:
+            parts.append(
+                f"**{dc.count} module(s) appear unreferenced** out of {dc.total_modules} candidate(s). "
+                "These are source files no other file imports or requires. "
+                "Verify before deleting — dynamic imports and entry points may not be detected.\n"
+            )
+            parts.append("| File | Language |")
+            parts.append("|---|---|")
+            for mod in dc.modules[:50]:
+                parts.append(f"| `{mod.relpath}` | {mod.language} |")
+            if len(dc.modules) > 50:
+                parts.append(f"\n_…and {len(dc.modules) - 50} more._")
+            parts.append("")
+        else:
+            parts.append(f"_No unreferenced modules detected out of {dc.total_modules} candidate(s)._\n")
+    else:
+        parts.append("_Dead code estimation was not run (disabled via --no-dead-code)._\n")
 
     # Largest source files
     parts.append("## Largest Source Files\n")
